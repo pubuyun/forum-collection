@@ -1,0 +1,74 @@
+2024-10-25 09:45:01.036 +08:00 [WRN] Code action yay
+2024-10-25 09:45:01.301 +08:00 [WRN] hi
+2024-10-25 09:45:01.302 +08:00 [WRN] Sync Handler
+2024-10-25 09:45:01.305 +08:00 [WRN] hi
+2024-10-25 09:45:01.306 +08:00 [WRN] hi references
+2024-10-25 09:45:01.307 +08:00 [WRN] hi document highlight
+2024-10-25 09:45:01.307 +08:00 [WRN] hi document symbol
+2024-10-25 09:45:01.838 +08:00 [ERR] file:///d:/pseudointerpreter/interpreter.p not found
+2024-10-25 11:38:38.886 +08:00 [WRN] Code action yay
+2024-10-25 11:38:39.245 +08:00 [WRN] hi
+2024-10-25 11:38:39.246 +08:00 [WRN] Sync Handler
+2024-10-25 11:38:39.248 +08:00 [WRN] hi
+2024-10-25 11:38:39.249 +08:00 [WRN] hi references
+2024-10-25 11:38:39.250 +08:00 [WRN] hi document highlight
+2024-10-25 11:38:39.259 +08:00 [WRN] hi document symbol
+2024-10-25 11:38:39.820 +08:00 [ERR] file:///d:/pseudointerpreter/test.p not found
+2024-10-25 11:38:39.927 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:40.442 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:41.616 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:41.815 +08:00 [WRN] Complete complete
+2024-10-25 11:38:42.373 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:43.398 +08:00 [WRN] Complete complete
+2024-10-25 11:38:44.119 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:44.404 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:44.540 +08:00 [WRN] Complete complete
+2024-10-25 11:38:46.392 +08:00 [WRN] Complete complete
+2024-10-25 11:38:47.455 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:49.012 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:51.745 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:52.481 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:52.830 +08:00 [WRN] Codeactioning
+2024-10-25 11:38:53.858 +08:00 [WRN] Complete complete
+2024-10-25 11:38:54.740 +08:00 [WRN] Complete complete
+2024-10-25 11:38:55.382 +08:00 [WRN] Codeactioning
+2024-10-25 11:40:17.749 +08:00 [WRN] Codeactioning
+2024-10-25 11:40:17.925 +08:00 [WRN] Codeactioning
+2024-10-25 11:40:48.593 +08:00 [WRN] Codeactioning
+2024-10-25 11:40:48.831 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:22.199 +08:00 [WRN] Code action yay
+2024-10-25 11:58:22.507 +08:00 [WRN] hi
+2024-10-25 11:58:22.507 +08:00 [WRN] Sync Handler
+2024-10-25 11:58:22.509 +08:00 [WRN] hi
+2024-10-25 11:58:22.511 +08:00 [WRN] hi references
+2024-10-25 11:58:22.512 +08:00 [WRN] hi document highlight
+2024-10-25 11:58:22.512 +08:00 [WRN] hi document symbol
+2024-10-25 11:58:23.238 +08:00 [ERR] file:///c:/Users/wzhzhang/Documents/codes%20for%20CS/W9C3T1.p not found
+2024-10-25 11:58:29.278 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:29.416 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:29.684 +08:00 [WRN] hover
+2024-10-25 11:58:31.050 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:32.940 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:33.910 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:34.932 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:35.351 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:35.684 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:40.205 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:40.432 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:40.853 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:40.946 +08:00 [WRN] hover
+2024-10-25 11:58:42.553 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:43.917 +08:00 [WRN] hover
+2024-10-25 11:58:43.990 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:44.209 +08:00 [WRN] hover
+2024-10-25 11:58:44.226 +08:00 [WRN] hover
+2024-10-25 11:58:44.245 +08:00 [WRN] hover
+2024-10-25 11:58:44.252 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:53.994 +08:00 [ERR] file:///d:/pseudointerpreter/test.p not found
+2024-10-25 11:58:54.011 +08:00 [WRN] Codeactioning
+2024-10-25 11:58:54.236 +08:00 [WRN] Codeactioning
+2024-10-25 12:52:08.359 +08:00 [WRN] Codeactioning
+2024-10-25 12:52:08.516 +08:00 [WRN] Codeactioning
+2024-10-25 12:52:38.133 +08:00 [WRN] Codeactioning
+2024-10-25 12:52:38.366 +08:00 [WRN] Codeactioning
+2024-10-25 12:52:38.977 +08:00 [WRN] Codeactioning
