@@ -1,0 +1,9 @@
+DECLARE num1 : INTEGER
+DECLARE num2 : INTEGER
+
+OUTPUT "Enter number 1"
+INPUT num1
+OUTPUT "Enter number 2"
+INPUT num2
+
+OUTPUT "DIV result: ", num1 DIV num2, "\nMOD result: ", num1 MOD num2
