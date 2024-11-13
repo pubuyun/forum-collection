@@ -1,9 +1,46 @@
-DECLARE num1 : INTEGER
-DECLARE num2 : INTEGER
+DECLARE CSTime:REAL
+DECLARE EconTime:REAL
+DECLARE HistTime:REAL
+DECLARE PhysTime:REAL
+DECLARE TimeInput:REAL
+DECLARE SubjectInput:STRING
+DECLARE CS_cnt:INTEGER
+DECLARE Econ_cnt:INTEGER
+DECLARE Hist_cnt:INTEGER
+DECLARE Phys_cnt:INTEGER
+DECLARE Continue:BOOLEAN        
+// Initalize
+CSTime <- 0
+EconTime <- 0
+HistTime <- 0
+PhysTime <- 0
+CS_cnt <- 0
+Econ_cnt <- 0
+Hist_cnt <- 0
+Phys_cnt <- 0
+Continue <- TRUE
 
-OUTPUT "Enter number 1"
-INPUT num1
-OUTPUT "Enter number 2"
-INPUT num2
-
-OUTPUT "DIV result: ", num1 DIV num2, "\nMOD result: ", num1 MOD num2
+WHILE Continue DO
+    OUTPUT "Which course is this assignment for? (CS, Econ, Hist, Phys):"
+    INPUT SubjectInput
+    OUTPUT "Enter the approximate time, in hours, this should take."
+    INPUT TimeInput
+    CASE OF SubjectInput
+        "CS":   CSTime <- CSTime + TimeInput
+                CS_cnt <- CS_cnt + 1
+        "Econ": EconTime <- EconTime + TimeInput
+                Econ_cnt <-Econ_cnt + 1
+        "Hist": HistTime <- HistTime + TimeInput
+                Hist_cnt <- Hist_cnt + 1
+        "Phys": PhysTime <- PhysTime + TimeInput
+                Phys_cnt <-Phys_cnt + 1
+        OTHERWISE: OUTPUT "Enter wrong."
+    ENDCASE
+    OUTPUT "Would you like to enter another assignment?(TRUE/FALSE)"
+    INPUT Continue
+ENDWHILE
+OUTPUT "New Assignments Entered:"
+OUTPUT "CS", CS_cnt, "Assignment(s)", CSTime, "Total hours"
+OUTPUT "Econ", Econ_cnt, "Assignment(s)", EconTime, "Total hours"
+OUTPUT "Hist", Hist_cnt, "Assignment(s)", HistTime, "Total hours"
+OUTPUT "Phys", Phys_cnt, "Assignment(s)", PhysTime, "Total hours"

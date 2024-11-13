@@ -76,6 +76,38 @@ class PseudoBuiltinError(InterpreterError, ValueError):
     def __str__(self):
         return (self.prompt + "\n" + self.parse3(self.origin, self.line))
     
+class PseudoInputError(InterpreterError, ValueError):
+    line: int
+    origin: list[str]
+    def __init__(self, prompt, origin, line):
+        self.prompt = prompt
+        self.origin = origin
+        self.line = line
+    def __str__(self):
+        return ("Input Error: " + self.prompt + "\n" + self.parse3(self.origin, self.line)) 
+    
+class PseudoUndefinedError(InterpreterError, RuntimeError):
+    name: str
+    prompt: str
+    origin: list[str]
+    def __init__(self, prompt, origin, line):
+        self.prompt = prompt
+        self.origin = origin
+        self.line = line
+    def __str__(self):
+        return ("Undefined Identifier: " + self.prompt + "\n" + self.parse3(self.origin, self.line)) 
+    
+class PseudoAssignmentError(InterpreterError, RuntimeError):
+    name: str
+    prompt: str
+    origin: list[str]
+    def __init__(self, prompt, origin, line):
+        self.prompt = prompt
+        self.origin = origin
+        self.line = line
+    def __str__(self):
+        return ("Assignment Error: " + self.prompt + "\n" + self.parse3(self.origin, self.line)) 
+    
 class Interpreter(ExpressionVisitor, StatementVisitor):
     variable_state: VariableState
 
@@ -250,7 +282,7 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
             return ret
 
         else:
-            raise NameError(f"name {function_name} is not defined")
+            raise PseudoUndefinedError(f"name {function_name} is not defined", self.origin, line)
 
             
     def visit_array_index(self, expr: ArrayIndex) -> Value:
@@ -366,7 +398,7 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
         if name not in self.variable_state.variables:
             raise InterpreterError(f"{name} was not declared")
         if name in self.variable_state.constants:
-            raise Interpreter(f"{name} is a constant, which can't be inputted")
+            raise PseudoInputError(f"{name} is a constant, which can't be inputted", self.origin, stmt.variable.token.line)
         
         
         inp = input().strip()
@@ -374,11 +406,11 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
         if vartype == PrimitiveType.INTEGER:
             inp = float(inp)
             if inp % 1:
-                raise ValueError(f"Entered real number for integer variable {name}")
+                raise PseudoInputError(f"Entered real number for integer variable {name}", self.origin, stmt.variable.token.line)
             val = int(inp)
         elif vartype == PrimitiveType.BOOLEAN:
             if not inp.upper() in ["TRUE", "FALSE"]:
-                raise ValueError(f"invalid input {inp} for boolean variable {name}")
+                raise PseudoInputError(f"invalid input {inp} for boolean variable {name}", self.origin, stmt.variable.token.line)
             val = True if inp.upper() == "TRUE" else False
         elif vartype == PrimitiveType.CHAR:
             val = inp[0]
@@ -386,7 +418,6 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
             val = inp
         elif vartype == PrimitiveType.REAL:
             val = float(inp)
-        
         
         if isinstance(stmt.variable, ArrayIndex):
             indices = [self.visit(indexexp)-1 for indexexp in stmt.variable.index]
@@ -396,6 +427,7 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
             self.variable_state.variables[name] = (arrcpy, self.variable_state.variables[name][1])
         else:
             self.variable_state.variables[name] = (val, self.variable_state.variables[name][1])
+            
     def visit_output(self, stmt: OutputStmt) -> None:
         values = [self.visit(expr) for expr in stmt.values]
         print("".join(map(str, values)))
@@ -418,10 +450,10 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
 
     def visit_proc_call(self, stmt: ProcedureCallStmt) -> None:
         procedure_name = stmt.name.value
-
+        line = stmt.name.line
         # Check if the procedure is defined
         if procedure_name not in self.variable_state.procedures:
-            raise NameError(f"Procedure {procedure_name} is not defined")
+            raise PseudoUndefinedError(f"Procedure {procedure_name} is not defined", self.origin, line)
 
         # Retrieve the procedure statement
         proc = self.variable_state.procedures[procedure_name]
@@ -465,8 +497,44 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
             if name not in self.variable_state.variables:
                 raise InterpreterError(f"{name} was not declared")
             if name in self.variable_state.constants:
-                raise RuntimeError(f"{name} is a constant, which can't be assigned a value.")
-            self.variable_state.variables[name] = (self.visit(stmt.value), self.variable_state.variables[name][1])
+                raise PseudoAssignmentError(f"{name} is a constant, which can't be assigned a value.", self.origin, stmt.target.token.line)
+            val = self.visit(stmt.value)
+            if self.check_type(val, self.variable_state.variables[name][1]):
+                self.variable_state.variables[name] = (val, self.variable_state.variables[name][1])
+            else:
+                raise PseudoAssignmentError(f"Type Error for assigning {name}, expected {self.variable_state.variables[name][1].name}", self.origin, stmt.target.token.line)
 
     def visit_program(self, stmt: Program) -> None:
         self.visit_statements(stmt.statements)
+
+    def check_type(self, val, typ):
+        if typ == PrimitiveType.INTEGER:
+            try:
+                val = float(val)
+            except:
+                return False
+            if val % 1:
+                return False
+            return True
+        if typ == PrimitiveType.REAL:
+            try:
+                val = float(val)
+            except:
+                return False
+            return True
+        if typ == PrimitiveType.STRING:
+            if isinstance(val, str):
+                return True
+            else:
+                return False
+        if typ == PrimitiveType.CHAR:
+            if isinstance(val, str) and len(val) == 1:
+                return True
+            else:
+                return False
+        if typ == PrimitiveType.BOOLEAN:
+            if isinstance(val, bool) or val in [0, 1]:
+                return True
+            else:
+                return False
+        

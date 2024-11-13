@@ -1,79 +1,67 @@
-import tornado.ioloop
-import tornado.web
-import subprocess
-import os
+import asyncio
+import websockets
 import json
-import logging
+import subprocess
+from functools import partial
+import random
 
-class CodeHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        # 允许跨域
-        self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Methods", "POST, OPTIONS")
-        self.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+class CodeExecutionServer:
+    def __init__(self):
+        self.process = None  # 用于存储子进程
 
-    def options(self):
-        # 为 OPTIONS 请求设置响应头
-        self.set_status(204)
-        self.finish()
+    async def run_code(self, websocket, code):
+        file = f"pscode{random.randint(1,2000)}.p"
+        f = open(file, "w")
+        f.write(code)
+        f.close()
+        
+        # 启动子进程执行代码，并连接到它的 stdin 和 stdout
+        self.process = await asyncio.create_subprocess_exec(
+            'python', 'cambridgeScript', file,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
 
-    def post(self):
-        # 记录请求
-        logging.info("Received request")
-        try:
-            # 获取 JSON 数据
-            data = json.loads(self.request.body)
-            logging.info("Received data: %s", data)
-            code = data.get("code", "")
-            user_input = data.get("input", "")
+        # 从子进程的 stdout 读取输出并发送给客户端
+        while True:
+            output = await self.process.stdout.readline()
+            if output == b"":
+                break
+            await websocket.send(json.dumps({"output": output.decode()}))
 
-            # 临时保存 Python 代码到文件
-            file_path = "./temp_code.p"
-            with open(file_path, "w") as code_file:
-                code_file.write(code)
+        # 读取子进程的 stderr（错误输出）并发送给客户端
+        while True:
+            error_output = await self.process.stderr.readline()
+            if error_output == b"":
+                break
+            await websocket.send(json.dumps({"output": error_output.decode()}))
 
-            # 使用 subprocess 运行 Python 脚本
-            try:
-                # 创建子进程并传入用户输入
-                process = subprocess.Popen(
-                    ["python", "cambridgeScript", "temp_code.p"],
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True
-                )
+        # 关闭子进程
+        await self.process.wait()
+        self.process = None
 
-                # 将用户输入发送到 Python 脚本的标准输入，并获取输出和错误信息
-                stdout, stderr = process.communicate(input=user_input)
+    async def send_input_to_program(self, input_text):
+        # 向子进程的 stdin 写入输入数据
+        if self.process:
+            self.process.stdin.write(input_text.encode() + b"\n")
+            await self.process.stdin.drain()
 
-                # 返回脚本的输出或错误信息
-                if stderr:
-                    self.write({"output": f"Output: {stdout} \nError: {stderr}"})
-                else:
-                    self.write({"output": stdout})
+    async def handler(self, websocket):
+        async for message in websocket:
+            data = json.loads(message)
+            if "code" in data:
+                # 如果接收到的消息包含代码，则执行代码
+                await self.run_code(websocket, data["code"])
+            elif "input" in data:
+                # 如果接收到的消息包含输入，则将输入发送给子进程
+                await self.send_input_to_program(data["input"])
 
-            except Exception as e:
-                logging.error("Execution error: %s", str(e))
-                self.write({"output": f"Execution error: {str(e)}"})
+async def main():
+    server = CodeExecutionServer()
+    # Use functools.partial to bind `server.handler` correctly
+    async with websockets.serve(partial(server.handler), "127.0.0.1", 5000):
+        print("Server started at ws://127.0.0.1:5000")
+        await asyncio.Future()  # 保持服务器运行
 
-            finally:
-                # 删除临时文件
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-                    logging.info("Temporary file removed")
-
-        except json.JSONDecodeError:
-            self.set_status(400)
-            self.write({"output": "Invalid JSON"})
-
-def make_app():
-    return tornado.web.Application([
-        (r"/", CodeHandler),
-    ])
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    app = make_app()
-    app.listen(5000)
-    logging.info("Tornado server started on http://0.0.0.0:5000")
-    tornado.ioloop.IOLoop.current().start()
+asyncio.run(main())
