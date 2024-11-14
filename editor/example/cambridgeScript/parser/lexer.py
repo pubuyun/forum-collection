@@ -32,6 +32,18 @@ class _EOFSentinel:
 
 EOF = _EOFSentinel()
 
+class InvalidTokenError(ValueError):
+    def parse3(self, origin, line):
+        if line >= 2 and line <= len(origin) - 1:
+            return f"{line-1} {origin[line-2]}\n{line} {origin[line-1]}\n" + "^^" + "^"*len(origin[line-1]) + f"\n{line+1} {origin[line]}"
+        else:
+            return f"{line} {origin[line-1]}\n" + "^^" + "^"*len(origin[line-1])
+    def __init__(self, prompt, origin, line) -> None:
+        self.prompt = prompt
+        self.origin = origin
+        self.line = line
+    def __str__(self) -> str:
+        return (self.prompt + "\n" + self.parse3(self.origin, self.line))
 
 @dataclass(frozen=True)
 class Token:
@@ -145,6 +157,7 @@ def parse_tokens(code: str) -> list[Token]:
     :return: a list containing the tokens in the program.
     :rtype: list[Token]
     """
+    origin = code.splitlines()
     res: list[Token] = []
     line_number: int = 1
     line_start: int = 0
@@ -161,8 +174,10 @@ def parse_tokens(code: str) -> list[Token]:
             line_start = token_start
             continue
         elif token_type == "INVALID":
-            raise ValueError(
-                f"Invalid token at line {line_number}, column {token_start - line_start}"
+            raise InvalidTokenError(
+                f"Invalid token {origin[line_number-1][token_start - line_start]} at line {line_number}, column {token_start - line_start}",
+                origin,
+                line_number
             )
         try:
             token = _parse_token(
@@ -172,7 +187,10 @@ def parse_tokens(code: str) -> list[Token]:
                 column=token_start - line_start,
             )
         except ValueError:
-            print(f"Invalid literal {token_value}")
-            raise
+            raise InvalidTokenError(
+                f"Invalid literal {token_value}",
+                origin,
+                line_number
+            )
         res.append(token)
     return res

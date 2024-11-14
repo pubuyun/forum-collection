@@ -41,9 +41,9 @@ import random
 class InterpreterError(Exception):
     def parse3(self, origin, line):
         if line >= 2 and line <= len(origin) - 1:
-            return f"{line-1} {origin[line-2]}\n{line} {origin[line-1]}\n" + "^"*len(origin[line-1]) + f"\n{line+1} {origin[line]}"
+            return f"{line-1} {origin[line-2]}\n{line} {origin[line-1]}\n" + "  " + "^"*len(origin[line-1]) + f"\n{line+1} {origin[line]}"
         else:
-            return f"{line} {origin[line-1]}\n" + "^"*len(origin[line-1])
+            return f"{line} {origin[line-1]}\n  " + "^"*len(origin[line-1])
 class InvalidNode(InterpreterError):
     node: Statement | Expression
     token: Token
@@ -121,7 +121,7 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
         else:
             return StatementVisitor.visit(self, thing)
 
-    def visit_statements(self, statements: list[Statement]):
+    def     visit_statements(self, statements: list[Statement]):
         for stmt in statements:
             if isinstance(stmt, ReturnStmt):
                 return self.visit_return(stmt)
@@ -287,7 +287,7 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
             
     def visit_array_index(self, expr: ArrayIndex) -> Value:
         name = expr.array.token.value
-        indices = [self.visit(indexexp)-1 for indexexp in expr.index]
+        indices = [self.visit(  indexexp)-1 for indexexp in expr.index]
         target = reduce(lambda x, i: x[i], indices, self.variable_state.variables[name][0].copy())
         return target
 
@@ -340,9 +340,6 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
             step_value = self.visit(stmt.step)
         else:
             step_value = 1
-        current_scope = self.variable_state.variables.copy()
-        new_scope = self.variable_state.variables.copy()
-        self.variable_state.variables = new_scope
         while current_value <= end_value if step_value > 0 else current_value >= end_value:
             self.variable_state.variables[name] = (current_value, PrimitiveType.INTEGER)
             ret = self.visit_statements(stmt.body)
@@ -404,7 +401,10 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
         inp = input().strip()
         print(inp)
         if vartype == PrimitiveType.INTEGER:
-            inp = float(inp)
+            try:
+                inp = float(inp)
+            except:
+                raise PseudoInputError(f"Non number value entered for integer variable {name}", self.origin, stmt.variable.token.line)
             if inp % 1:
                 raise PseudoInputError(f"Entered real number for integer variable {name}", self.origin, stmt.variable.token.line)
             val = int(inp)
@@ -417,8 +417,11 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
         elif vartype == PrimitiveType.STRING:
             val = inp
         elif vartype == PrimitiveType.REAL:
-            val = float(inp)
-        
+            try:
+                inp = float(inp)
+            except:
+                raise PseudoInputError(f"Non number value entered for integer variable {name}", self.origin, stmt.variable.token.line)
+            val = inp
         if isinstance(stmt.variable, ArrayIndex):
             indices = [self.visit(indexexp)-1 for indexexp in stmt.variable.index]
             arrcpy = self.variable_state.variables[name][0].copy()
@@ -487,6 +490,8 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
                     array: Expression
                     index: list[Expression] '''
             val = self.visit(stmt.value)
+            if not self.check_type(val, self.variable_state.variables[name][1].type):
+                raise PseudoAssignmentError(f"Trying to assign invalid type to array {name}, expected {self.variable_state.variables[name][1].type.name}", self.origin, stmt.target.array.token.line)
             indices = [self.visit(indexexp)-1 for indexexp in stmt.target.index]
             arrcpy = self.variable_state.variables[name][0].copy()
             target = reduce(lambda x, i: x[i], indices[:-1], arrcpy)
@@ -509,6 +514,8 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
 
     def check_type(self, val, typ):
         if typ == PrimitiveType.INTEGER:
+            if type(val) != int and type(val) != float:
+                return False
             try:
                 val = float(val)
             except:

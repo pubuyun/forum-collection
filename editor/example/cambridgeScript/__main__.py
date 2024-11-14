@@ -1,6 +1,6 @@
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+sys.tracebacklimit = 0
 if __name__ == "__main__":
     # cli()
     from cambridgeScript.parser.lexer import parse_tokens

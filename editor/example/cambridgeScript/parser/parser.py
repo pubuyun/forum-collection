@@ -63,9 +63,9 @@ class ParserError(Exception):
     """Base exception class for errors from the parser"""
     def parse3(self, origin, line):
         if line >= 2 and line <= len(origin) - 1:
-            return f"{line-1} {origin[line-2]}\n{line} {origin[line-1]}\n" + "^"*len(origin[line-1]) + f"\n{line+1} {origin[line]}"
+            return f"{line-1} {origin[line-2]}\n{line} {origin[line-1]}\n" + "^^" + "^"*len(origin[line-1]) + f"\n{line+1} {origin[line]}"
         else:
-            return f"{line} {origin[line-1]}\n" + "^"*len(origin[line-1])
+            return f"{line} {origin[line-1]}\n" + "^^" + "^"*len(origin[line-1])
     def __init__(self, prompt, origin, line) -> None:
         self.prompt = prompt
         self.origin = origin

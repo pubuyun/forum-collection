@@ -1,3 +1,0 @@
-// type your code... 
-DECLARE a:INTEGER
-INPUT a
