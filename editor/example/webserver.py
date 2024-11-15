@@ -59,7 +59,7 @@ async def execute_code(websocket, code, clientid):
     try:
         # 启动子进程
         process = await asyncio.create_subprocess_exec(
-            "python", "cambridgeScript", temp_file_path,  # 直接运行创建的文件
+            "python3", "cambridgeScript", temp_file_path,  # 直接运行创建的文件
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
@@ -104,6 +104,8 @@ async def main():
     async with websockets.serve(handle_connection, "127.0.0.1", 5000):
         print("WebSocket server is running on ws://127.0.0.1:5000")
         await asyncio.Future()  # Run forever
+        
+        
 
 if __name__ == "__main__":
     try:
