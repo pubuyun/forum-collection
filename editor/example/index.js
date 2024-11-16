@@ -8,6 +8,8 @@ import GithubLight from "monaco-themes/themes/GitHub Light.json";
 
 
 // 定义全局样式
+const loading = document.getElementById("root");
+
 const GlobalStyle = createGlobalStyle`
   body {
     background-color: ${({ theme }) => (theme === 'one-dark-pro' ? '#222222' : '#fbfbfb')};
@@ -59,6 +61,8 @@ const OutputEditor = styled(MonacoEditor)`
   color: ${({ isError }) => (isError ? '#ffcccc' : 'inherit')};
 `;
 
+
+
 class CodeEditor extends React.Component {
   constructor() {
     super();
@@ -76,7 +80,7 @@ class CodeEditor extends React.Component {
     
   }
   connectWebSocket = () => {
-    const socket = new WebSocket("ws://127.0.0.1:5000/ws");
+    const socket = new WebSocket("ws://120.25.192.209:5000/ws");
   
     socket.onopen = () => {
       console.log("WebSocket connected");
@@ -640,5 +644,11 @@ const App = () => (
 );
 
 const container = document.getElementById("root");
+
+const loadingContainer = document.getElementById("loading-container");
+if (loadingContainer) {
+    loadingContainer.remove();
+}
+
 const root = createRoot(container);
 root.render(<App />);

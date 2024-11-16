@@ -101,8 +101,8 @@ async def send_input(process, input_text):
             print(f"Unexpected error: {e}")
 
 async def main():
-    async with websockets.serve(handle_connection, "127.0.0.1", 5000):
-        print("WebSocket server is running on ws://127.0.0.1:5000")
+    async with websockets.serve(handle_connection, "0.0.0.0", 5000):
+        print("WebSocket server is running on ws://0.0.0.0:5000")
         await asyncio.Future()  # Run forever
         
         

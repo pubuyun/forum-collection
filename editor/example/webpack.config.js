@@ -50,5 +50,10 @@ module.exports = {
       languages: ["json", "javascript", "typescript"],
     }),
   ],
-  devServer: { contentBase: "./" },
+  devServer: { 
+    contentBase: "./",
+    host: "0.0.0.0",  // 添加这一行
+    disableHostCheck: true, 
+  }
+
 };
