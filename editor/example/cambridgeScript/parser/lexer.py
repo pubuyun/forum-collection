@@ -112,12 +112,14 @@ _TOKENS = [
     ("IGNORE", r"/\*.*\*/|(?://|#).*$|[ \t]+"),
     ("NEWLINE", r"\n"),
     ("KEYWORD", "|".join(Keyword)),
-    ("SYMBOL", "|".join(re.escape(s) for s in Symbol)), 
+    ("SYMBOL", r"-|(" + "|".join(re.escape(s) for s in Symbol if s != "-") + ")"),
     ("LITERAL", r'-?[0-9]+(?:\.[0-9]+)?|".*?"'),
     ("IDENTIFIER", r"[A-Za-z_][A-Za-z0-9_]*"),
     ("INVALID", r"."),
     ("EOF", r"$"),
 ]
+
+
 
 
 _TOKEN_REGEX = "|".join(f"(?P<{name}>{regex})" for name, regex in _TOKENS)
@@ -133,7 +135,6 @@ def _parse_literal(literal: str) -> Value:
             return int(literal)
     except ValueError:
         raise ValueError("Invalid literal")
-
 
 def _parse_token(token_string: str, token_type: str, **token_kwargs) -> Token:
     if token_type == "KEYWORD":
@@ -158,13 +159,19 @@ def parse_tokens(code: str) -> list[Token]:
     :rtype: list[Token]
     """
     origin = code.splitlines()
+    originNoSpace = code.replace(" ", "").splitlines()
     res: list[Token] = []
     line_number: int = 1
     line_start: int = 0
+    last_token = None  # 记录最后一个有效 Token
+    jump = False
     for match in re.finditer(_TOKEN_REGEX, code, re.M):
+        if jump: 
+            jump = False 
+            continue
         token_type = match.lastgroup
         if token_type is None:
-            raise ValueError("An error occured")
+            raise ValueError("An error occurred")
         token_value = str(match.group())
         token_start = match.start()
         if token_type == "IGNORE":
@@ -175,10 +182,32 @@ def parse_tokens(code: str) -> list[Token]:
             continue
         elif token_type == "INVALID":
             raise InvalidTokenError(
-                f"Invalid token {origin[line_number-1][token_start - line_start]} at line {line_number}, column {token_start - line_start}",
+                f"Invalid token {originNoSpace[line_number - 1][token_start - line_start - 1]} at line {line_number}, column {token_start - line_start}",
                 origin,
                 line_number
             )
+
+        # 特殊处理负号
+        if token_type == "SYMBOL" and token_value == "-":
+            if (last_token is None or  # 行首
+                isinstance(last_token, SymbolToken) or  # 紧接符号
+                isinstance(last_token, KeywordToken) or  # 关键字后
+                isinstance(last_token, EOFToken)):  # 文件末尾前
+                # 尝试将后续的 Token 与当前符号结合
+                match_next = re.match(_TOKEN_REGEX, code[match.end():])
+                if match_next and match_next.lastgroup == "LITERAL":
+                    literal_value = code[match.end():match.end() + len(match_next.group())]
+                    token_value = f"-{literal_value}"
+                    token_type = "LITERAL"
+                    match = re.match(_TOKEN_REGEX, code[match.start():match.start() + len(token_value)])
+                else:
+                    raise InvalidTokenError(
+                        f"Invalid token '-' at line {line_number}, column {token_start - line_start}",
+                        origin,
+                        line_number
+                    )
+                jump = True
+
         try:
             token = _parse_token(
                 token_value,
@@ -192,5 +221,7 @@ def parse_tokens(code: str) -> list[Token]:
                 origin,
                 line_number
             )
+
         res.append(token)
+        last_token = token  # 更新最后一个 Token
     return res

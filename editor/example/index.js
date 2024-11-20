@@ -2,24 +2,19 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import styled from 'styled-components';
 import MonacoEditor from "react-monaco-editor";
+import data from './autocomplete.json';
 import { createGlobalStyle } from 'styled-components';
 import OneDarkPro from "monaco-themes/themes/OneDark-Pro.json";
 import GithubLight from "monaco-themes/themes/GitHub Light.json";
-
 
 // 定义全局样式
 const loading = document.getElementById("root");
 
 const GlobalStyle = createGlobalStyle`
-  body {
-    background-color: ${({ theme }) => (theme === 'one-dark-pro' ? '#222222' : '#fbfbfb')};
-    color: ${({ theme }) => (theme === 'one-dark-pro' ? '#ffffff' : '#000000')};
+  .custom {
+    background-color: ${({ theme }) => (theme === 'one-dark-pro' ? '#282c36' : '#fbfbfb')};
+    color: ${({ theme }) => (theme === 'one-dark-pro' ? '#ffffff' : '#222222')};
   }
-  div {
-    background-color: ${({ theme }) => (theme === 'one-dark-pro' ? '#222222' : '#fbfbfb')};
-    color: ${({ theme }) => (theme === 'one-dark-pro' ? '#ffffff' : '#000000')};
-  }
-
   h2, h3 {
     color: ${({ theme }) => (theme === 'one-dark-pro' ? '#ffffff' : '#333333')};
   }
@@ -80,7 +75,7 @@ class CodeEditor extends React.Component {
     
   }
   connectWebSocket = () => {
-    const socket = new WebSocket("ws://120.25.192.209:5000/ws");
+    const socket = new WebSocket("ws://120.25.192.109:5000/");
   
     socket.onopen = () => {
       console.log("WebSocket connected");
@@ -114,7 +109,11 @@ class CodeEditor extends React.Component {
   };
   
   componentDidMount() {
-    this.connectWebSocket()
+    const savedCode = localStorage.getItem("savedCode");
+    if (savedCode) {
+      this.setState({ code: savedCode });
+    }
+    this.connectWebSocket();
   }
 
   reconnect = () => {
@@ -151,6 +150,11 @@ class CodeEditor extends React.Component {
     monaco.editor.defineTheme("one-dark-pro", OneDarkPro);
     monaco.editor.defineTheme("github-light", GithubLight);
 
+    const kindMapping = {
+      Keyword: monaco.languages.CompletionItemKind.Keyword,
+      Function: monaco.languages.CompletionItemKind.Function,
+      Variable: monaco.languages.CompletionItemKind.Variable,
+    };
     // 注册自定义语言
     monaco.languages.register({ id: "PseudoCode" });
 
@@ -202,13 +206,13 @@ class CodeEditor extends React.Component {
         // 获取当前文本内容
         const code = model.getValue();
         this.variables.clear();
-        // 提取 DECLARE 声明的变量名
-        const declareRegex = /\bDECLARE\b\s+([A-Za-z_][A-Za-z0-9_]*):/g;
-        let match;
-        while ((match = declareRegex.exec(code)) !== null) {
-          const variableName = match[1];
-          this.variables.add(variableName);
-        }
+          // 提取 DECLARE 声明的变量名
+          const declareRegex = /\bDECLARE\b\s+([A-Za-z_][A-Za-z0-9_]*(?:\s*,\s*[A-Za-z_][A-Za-z0-9_]*)*):/g;
+          let match;
+          while ((match = declareRegex.exec(code)) !== null) {
+            const variableName = match[1];
+            this.variables.add(variableName);
+          }
 
         // 提取 FOR 循环中定义的变量名
         const forLoopRegex = /\bFOR\b\s+([A-Za-z_][A-Za-z0-9_]*)\s*<-/g;
@@ -227,321 +231,24 @@ class CodeEditor extends React.Component {
 
         return {suggestions:[
           ...variableSuggestions,
-          {
-            label: "PROCEDURE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "PROCEDURE",
-            documentation: "Defines a new procedure"
-          },
-          {
-            label: "ENDPROCEDURE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "ENDPROCEDURE",
-            documentation: "Ends a procedure"
-          },
-          {
-            label: "FUNCTION",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "FUNCTION",
-            documentation: "Defines a new function"
-          },
-          {
-            label: "RETURNS",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "RETURNS",
-            documentation: "Specifies the return type of a function"
-          },
-          {
-            label: "ENDFUNCTION",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "ENDFUNCTION",
-            documentation: "Ends a function definition"
-          },
-          {
-            label: "IF",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "IF",
-            documentation: "Conditional statement"
-          },
-          {
-            label: "THEN",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "THEN",
-            documentation: "Used with IF"
-          },
-          {
-            label: "ELSE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "ELSE",
-            documentation: "Else block in IF-ELSE"
-          },
-          {
-            label: "ENDIF",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "ENDIF",
-            documentation: "Ends an IF block"
-          },
-          {
-            label: "CASE OF",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "CASE OF",
-            documentation: "Switch case-like structure"
-          },
-          {
-            label: "OF",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "OF",
-            documentation: "Used in CASE OF"
-          },
-          {
-            label: "OTHERWISE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "OTHERWISE",
-            documentation: "Default case in CASE OF"
-          },
-          {
-            label: "ENDCASE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "ENDCASE",
-            documentation: "Ends a CASE OF block"
-          },
-          {
-            label: "FOR",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "FOR",
-            documentation: "For loop"
-          },
-          {
-            label: "TO",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "TO",
-            documentation: "Used in FOR loop"
-          },
-          {
-            label: "STEP",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "STEP",
-            documentation: "Increment in FOR loop"
-          },
-          {
-            label: "NEXT",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "NEXT",
-            documentation: "End of FOR loop"
-          },
-          {
-            label: "REPEAT",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "REPEAT",
-            documentation: "Repeat loop"
-          },
-          {
-            label: "UNTIL",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "UNTIL",
-            documentation: "Used with REPEAT"
-          },
-          {
-            label: "WHILE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "WHILE",
-            documentation: "While loop"
-          },
-          {
-            label: "DO",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "DO",
-            documentation: "Used with WHILE"
-          },
-          {
-            label: "ENDWHILE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "ENDWHILE",
-            documentation: "Ends a WHILE loop"
-          },
-          {
-            label: "DECLARE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "DECLARE",
-            documentation: "Declares a variable"
-          },
-          {
-            label: "CONSTANT",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "CONSTANT",
-            documentation: "Declares a constant"
-          },
-          {
-            label: "INPUT",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "INPUT",
-            documentation: "Input statement"
-          },
-          {
-            label: "OUTPUT",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "OUTPUT",
-            documentation: "Output statement"
-          },
-          {
-            label: "RETURN",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "RETURN",
-            documentation: "Return statement"
-          },
-          {
-            label: "OPENFILE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "OPENFILE",
-            documentation: "File open operation"
-          },
-          {
-            label: "READFILE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "READFILE",
-            documentation: "File read operation"
-          },
-          {
-            label: "WRITEFILE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "WRITEFILE",
-            documentation: "File write operation"
-          },
-          {
-            label: "CLOSEFILE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "CLOSEFILE",
-            documentation: "File close operation"
-          },
-          {
-            label: "CALL",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "CALL",
-            documentation: "Call function or procedure"
-          },
-          {
-            label: "ARRAY",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "ARRAY",
-            documentation: "Array declaration"
-          },
-          {
-            label: "INTEGER",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "INTEGER",
-            documentation: "Integer data type"
-          },
-          {
-            label: "REAL",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "REAL",
-            documentation: "Real number data type"
-          },
-          {
-            label: "CHAR",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "CHAR",
-            documentation: "Character data type"
-          },
-          {
-            label: "STRING",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "STRING",
-            documentation: "String data type"
-          },
-          {
-            label: "BOOLEAN",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "BOOLEAN",
-            documentation: "Boolean data type"
-          },
-          {
-            label: "READ",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "READ",
-            documentation: "Read operation"
-          },
-          {
-            label: "WRITE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "WRITE",
-            documentation: "Write operation"
-          },
-          {
-            label: "TRUE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "TRUE",
-            documentation: "Boolean true value"
-          },
-          {
-            label: "FALSE",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "FALSE",
-            documentation: "Boolean false value"
-          },
-          {
-            label: "AND",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "AND",
-            documentation: "Logical AND operator"
-          },
-          {
-            label: "OR",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "OR",
-            documentation: "Logical OR operator"
-          },
-          {
-            label: "NOT",
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: "NOT",
-            documentation: "Logical NOT operator"
-          },
-          {
-            label: "SUBSTRING",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "SUBSTRING",
-            documentation: "SUBSTRING(string, startindex, endindex), Extracts a substring from a string"
-          },
-          {
-            label: "RANDOM",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "RANDOM",
-            documentation: "RANDOM() returns a value -> [0,1] (0 to 1 inclusive)"
-          },
-          {
-            label: "LENGTH",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "LENGTH",
-            documentation: "LENGTH(string) returns the length of the string"
-          },
-          {
-            label: "LCASE",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "LCASE",
-            documentation: "LCASE(string) returns the lower case of the string"
-          },
-          {
-            label: "UCASE",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "UCASE",
-            documentation: "UCASE(string) returns the upper case of the string"
-          }
+          ...data.map(item => ({
+            label: item.label,
+            kind: kindMapping[item.kind] || monaco.languages.CompletionItemKind.Text, // 默认值
+            insertText: item.insertText,
+            documentation: item.documentation,
+          }))
         ]};
       }
   })
   }
   onChange = (newValue) => {
     this.setState({ code: newValue });
+    localStorage.setItem("savedCode", newValue); // 保存代码到 localStorage
   };
 
   toggleTheme = () => {
     const newTheme = this.state.theme === 'github-light' ? 'one-dark-pro' : 'github-light';
     this.setState({ theme: newTheme });
-    document.body.style.backgroundColor = newTheme === 'one-dark-pro' ? '#121212' : '#ffffff';
-    document.div.style.backgroundColor = newTheme === 'one-dark-pro' ? '#121212' : '#ffffff';
-    document.h3.style.color = newTheme === 'one-dark-pro' ? '#ffffff' : '#000000';
-    document.h2.style.color = newTheme === 'one-dark-pro' ? '#ffffff' : '#000000';
   };
 
   editorDidMount = (editor) => {
@@ -581,9 +288,9 @@ class CodeEditor extends React.Component {
   render() {
     const { code, theme, output, inputText, isError } = this.state;
     return (
-      <Container>
+      <Container class="custom">
         <GlobalStyle theme={theme} />
-        <Sidebar>
+        <Sidebar class="custom">
           <Button onClick={this.runCode}>Run Code</Button>
           <Button onClick={this.toggleTheme}>
             {theme === 'github-light' ? 'Switch to Dark' : 'Switch to Light'}
@@ -608,7 +315,7 @@ class CodeEditor extends React.Component {
             options={{
               readOnly: true,
               minimap: { enabled: false },
-              renderLineHighlight: "none",
+              renderLineHighlight: false,
             }}
             theme={theme}
             isError={isError} // 根据 isError 设置背景颜色

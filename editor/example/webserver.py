@@ -59,7 +59,7 @@ async def execute_code(websocket, code, clientid):
     try:
         # 启动子进程
         process = await asyncio.create_subprocess_exec(
-            "python3", "cambridgeScript", temp_file_path,  # 直接运行创建的文件
+            "python", "cambridgeScript", temp_file_path,  # 直接运行创建的文件
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE

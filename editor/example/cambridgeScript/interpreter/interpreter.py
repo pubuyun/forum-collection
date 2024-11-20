@@ -107,6 +107,16 @@ class PseudoAssignmentError(InterpreterError, RuntimeError):
         self.line = line
     def __str__(self):
         return ("Assignment Error: " + self.prompt + "\n" + self.parse3(self.origin, self.line)) 
+
+class PseudoIndexError(InterpreterError, ValueError):
+    line: int
+    origin: list[str]
+    def __init__(self, prompt, origin, line):
+        self.prompt = prompt
+        self.origin = origin
+        self.line = line
+    def __str__(self):
+        return (self.prompt + "\n" + self.parse3(self.origin, self.line))
     
 class Interpreter(ExpressionVisitor, StatementVisitor):
     variable_state: VariableState
@@ -287,8 +297,13 @@ class Interpreter(ExpressionVisitor, StatementVisitor):
             
     def visit_array_index(self, expr: ArrayIndex) -> Value:
         name = expr.array.token.value
-        indices = [self.visit(  indexexp)-1 for indexexp in expr.index]
-        target = reduce(lambda x, i: x[i], indices, self.variable_state.variables[name][0].copy())
+        if not isinstance(self.variable_state.variables[name][1], ArrayType):
+            raise PseudoAssignmentError(f"{name} is not an array.", self.origin, expr.array.token.line)
+        indices = [self.visit(indexexp)-1 for indexexp in expr.index]
+        try:
+            target = reduce(lambda x, i: x[i], indices, self.variable_state.variables[name][0].copy())
+        except IndexError:
+            raise PseudoIndexError(f"List index out of range, trying to access {name}{''.join(f'[{indice}]' for indice in indices)}", self.origin, expr.array.token.line)
         return target
 
     def visit_literal(self, expr: Literal) -> Value:

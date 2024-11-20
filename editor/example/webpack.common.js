@@ -5,8 +5,6 @@ const path = require("path");
 
 module.exports = {
   entry: "./index.js",
-  mode: "development",
-  devtool: "source-map",
   output: {
     path: path.join(__dirname, "./lib/t"),
     filename: "index.js",
@@ -50,9 +48,4 @@ module.exports = {
       languages: ["javascript"],
     }),
   ],
-  devServer: { 
-    contentBase: "./",
-    host: "0.0.0.0",  // 添加这一行
-    disableHostCheck: true, 
-  }
 };
