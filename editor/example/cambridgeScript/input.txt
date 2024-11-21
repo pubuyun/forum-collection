@@ -7,13 +7,14 @@ FOR iterator <- 1 TO 5
 	INPUT names[iterator]
 NEXT iterator
 
+  
 //65-90
 FUNCTION ASCII(string : STRING) RETURNS INTEGER
 	DECLARE ascii : INTEGER
 	ascii <- 0
 	DECLARE s : STRING
 	s <- UCASE(string)
-	DECLARE letters : ARRAY[1:26] OF STRING
+	DECLARE letters : ARRAY[1:26] OF CHAR
 	letters[1] <- "A"
 	letters[2] <- "B"
 	letters[3] <- "C"
@@ -41,40 +42,39 @@ FUNCTION ASCII(string : STRING) RETURNS INTEGER
 	letters[25] <- "Y"
 	letters[26] <- "Z"
 	
-
+	
 	FOR iterator<-1 TO LENGTH(s)
 		DECLARE flag : BOOLEAN
-		flag <- TRUE
-
-
+		flag <- TRUE  
+		
 		DECLARE asci : INTEGER
+		asci <- 0
+		
 		FOR jiterator<-1 TO 26
 			IF flag THEN
-				IF s[iterator] = letters[jiterator] THEN
+				IF SUBSTRING(s,iterator,1) = letters[jiterator] THEN
 					asci <- 64+jiterator
 					flag <- FALSE
 				ENDIF
 			ENDIF
 		NEXT jiterator
-
-		ascii <- asc*100 + asci
+		  
+		ascii <- asci*100 + asci
 	NEXT iterator
-	RETURN asc
-ENDFUNCTION
+	RETURN ascii
 
+ENDFUNCTION
 
 
 FOR iterator <- 1 TO 4
 	FOR jiterator <- 1 TO 5 - iterator
 		IF ASCII(names[jiterator]) > ASCII(names[jiterator+1]) THEN
-			DECLARE temp : STRING
 			temp <- names[jiterator]
 			names[jiterator] <- names[jiterator+1]
 			names[jiterator+1] <- temp
 		ENDIF
 	NEXT jiterator
-NEXT iterator
-
+NEXT iterator  
 
 FOR iterator <- 1 TO 5
 	OUTPUT names[iterator]

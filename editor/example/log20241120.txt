@@ -175,3 +175,6 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 2024-11-20 15:44:32.177 +08:00 [ERR] file:///d:/pseudointerpreter/editor/example/2474910434384.p not found
 2024-11-20 15:44:32.194 +08:00 [WRN] Codeactioning
 2024-11-20 15:44:32.450 +08:00 [WRN] Codeactioning
+2024-11-20 16:25:42.286 +08:00 [ERR] file:///d:/pseudointerpreter/editor/example/test.p not found
+2024-11-20 16:25:42.288 +08:00 [WRN] Codeactioning
+2024-11-20 16:25:42.564 +08:00 [WRN] Codeactioning

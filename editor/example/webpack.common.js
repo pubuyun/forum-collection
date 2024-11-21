@@ -1,32 +1,26 @@
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
-
-// const MonacoEditorSrc = path.join(__dirname, "..", "src");
 
 module.exports = {
   entry: "./index.js",
   output: {
-    path: path.join(__dirname, "./lib/t"),
-    filename: "index.js",
+    path: path.join(__dirname, "dist"),
+    filename: "index.js", // 输出的 JS 文件名
+    clean: true, // 每次构建前清理 /dist 文件夹
   },
   module: {
     rules: [
       {
-        test: /\.html$/,
-        use: ["file?name=[name].[ext]"],
-      },
-      {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: "babel-loader",
-            options: {
-              presets: ["@babel/preset-env", "@babel/preset-react"],
-              plugins: ["@babel/plugin-proposal-class-properties"],
-            },
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env", "@babel/preset-react"],
+            plugins: ["@babel/plugin-proposal-class-properties"],
           },
-        ],
+        },
       },
       {
         test: /\.css$/,
@@ -34,18 +28,20 @@ module.exports = {
       },
       {
         test: /\.ttf$/,
-        type: 'asset/resource'
+        type: "asset/resource",
       },
     ],
   },
   resolve: {
     extensions: [".js", ".json"],
-    // Remove alias until https://github.com/microsoft/monaco-editor-webpack-plugin/issues/68 is fixed
-    // alias: { "react-monaco-editor": MonacoEditorSrc }
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      template: "./index.html", // 使用你的模板文件
+      filename: "index.html", // 输出文件名
+    }),
     new MonacoWebpackPlugin({
-      languages: ["javascript"],
+      languages: ["plaintext", "javascript"], // 仅加载必要语言
     }),
   ],
 };

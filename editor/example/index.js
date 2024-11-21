@@ -1,69 +1,17 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import styled from 'styled-components';
 import MonacoEditor from "react-monaco-editor";
 import data from './autocomplete.json';
-import { createGlobalStyle } from 'styled-components';
-import OneDarkPro from "monaco-themes/themes/OneDark-Pro.json";
-import GithubLight from "monaco-themes/themes/GitHub Light.json";
-
-// 定义全局样式
-const loading = document.getElementById("root");
-
-const GlobalStyle = createGlobalStyle`
-  .custom {
-    background-color: ${({ theme }) => (theme === 'one-dark-pro' ? '#282c36' : '#fbfbfb')};
-    color: ${({ theme }) => (theme === 'one-dark-pro' ? '#ffffff' : '#222222')};
-  }
-  h2, h3 {
-    color: ${({ theme }) => (theme === 'one-dark-pro' ? '#ffffff' : '#333333')};
-  }
-`;
-const Sidebar = styled.div`
-  flex: 0 0 30%; // 占据 30% 的宽度
-  height: 100vh;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  border:1px solid grey
-  gap: 20px;
-`;
-
-const MainEditor = styled.div`
-  flex: 0 0 70%; // 占据 70% 的宽度
-  height: 100vh;
-`;
-
-const Container = styled.div`
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-`;
-
-const Button = styled.button`
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 10px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-const OutputEditor = styled(MonacoEditor)`
-  color: ${({ isError }) => (isError ? '#ffcccc' : 'inherit')};
-`;
-
-
+import "./styles.css"; 
+import OneDarkPro from "./themes/OneDark-Pro.json";
+import GithubLight from "./themes/GitHub Light.json";
 
 class CodeEditor extends React.Component {
   constructor() {
     super();
     
     this.state = {
-      code: "// type your code... \n",
+      code: "OUTPUT \"HelloWorld\"",
       theme: "one-dark-pro",
       output: "",
       inputText: "", // 新增状态用于存储输入框内容
@@ -287,60 +235,51 @@ class CodeEditor extends React.Component {
 
   render() {
     const { code, theme, output, inputText, isError } = this.state;
+    document.documentElement.style.setProperty("--bg-color", theme === "one-dark-pro" ? "#282c36" : "#fbfbfb");
+    document.documentElement.style.setProperty("--text-color", theme === "one-dark-pro" ? "#ffffff" : "#222222");
+    document.documentElement.style.setProperty("--heading-color", theme === "one-dark-pro" ? "#ffffff" : "#333333");
+
     return (
-      <Container class="custom">
-        <GlobalStyle theme={theme} />
-        <Sidebar class="custom">
-          <Button onClick={this.runCode}>Run Code</Button>
-          <Button onClick={this.toggleTheme}>
-            {theme === 'github-light' ? 'Switch to Dark' : 'Switch to Light'}
-          </Button>
+      <div className="container custom">
+        <div className="sidebar custom">
+          <button onClick={this.runCode}>Run Code</button>
+          <button onClick={this.toggleTheme}>
+            {theme === "github-light" ? "Switch to Dark" : "Switch to Light"}
+          </button>
           <h3>Input</h3>
           <MonacoEditor
             height="200"
             language="plaintext"
             value={inputText}
-            options={{ selectOnLineNumbers: true,
-              renderLineHighlight: "all",
-              renderSelectionHighlight: true }}
             onChange={this.handleInputChange}
             theme={theme}
           />
-          <Button onClick={this.sendInputToSocket}>Send</Button>
+          <button onClick={this.sendInputToSocket}>Send</button>
           <h3>Output</h3>
-          <OutputEditor
+          <MonacoEditor
             height="200"
             language="plaintext"
             value={output}
-            options={{
-              readOnly: true,
-              minimap: { enabled: false },
-              renderLineHighlight: false,
-            }}
+            options={{ readOnly: true }}
             theme={theme}
-            isError={isError} // 根据 isError 设置背景颜色
+            className={isError ? "output-error" : ""}
           />
-        </Sidebar>
-        <MainEditor>
+        </div>
+        <div className="main-editor">
           <MonacoEditor
             height="100vh"
             width="100%"
             language="PseudoCode"
             value={code}
-            options={{ selectOnLineNumbers: true,
-              renderLineHighlight: "all",
-              renderSelectionHighlight: true }}
-            onChange={this.onChange}
+            onChange={(newValue) => this.setState({ code: newValue })}
             theme={theme}
             editorWillMount={this.editorWillMount}
           />
-        </MainEditor>
-      </Container>
+        </div>
+      </div>
     );
   }
 }
-
-
 
 const App = () => (
   <div>
