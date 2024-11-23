@@ -6,13 +6,12 @@
   "main": "index.html",
   "scripts": {
     "start": "webpack serve --hot --inline --progress --port 8886 --config webpack.dev.js",
-    "build": "rimraf dist && webpack --config webpack.prod.js --mode production"
+    "build": "webpack --config webpack.prod.js --mode production"
   },
   "authors": [
-    "Leon Shi <superRaytin@gmail.com>",
-    "Dominik Moritz <domoritz@gmail.com>"
+    "Willes Zhang <wzh.zhang@qq.com>"
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/plugin-proposal-class-properties": "^7.18.6",

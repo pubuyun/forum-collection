@@ -7,8 +7,8 @@ if __name__ == "__main__":
     from parser.parser import Parser
     from interpreter.variables import VariableState
     from interpreter.interpreter import Interpreter
-    # file = open(sys.argv[1], 'r')
-    file = open("cambridgeScript\\input.txt", 'r')
+    file = open(sys.argv[1], 'r')
+    # file = open("cambridgeScript\\input.txt", 'r')
     code = file.read()
     tokens = parse_tokens(code)
     # for token in tokens:

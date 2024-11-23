@@ -271,7 +271,7 @@ class CodeEditor extends React.Component {
             width="100%"
             language="PseudoCode"
             value={code}
-            onChange={(newValue) => this.setState({ code: newValue })}
+            onChange={this.onChange}
             theme={theme}
             editorWillMount={this.editorWillMount}
           />
