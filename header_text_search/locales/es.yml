@@ -1,0 +1,10 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
+es:
+  search_banner:
+    headline: "Te damos la bienvenida a nuestra comunidad"
+    subhead: "Estamos encantados de tenerte aquí. Si necesitas ayuda, busca antes de publicar."

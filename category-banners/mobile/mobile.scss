@@ -1,0 +1,119 @@
+body:not(.category-header) {
+  // hides banners based on outcome of shouldShow
+  .category-title-header {
+    display: none;
+  }
+}
+
+.category-title-contents {
+  display: grid;
+  grid-template-areas: "logo title" "logo description";
+  grid-template-columns: auto 1fr;
+  border-radius: 20px; // 修改为20px圆角
+  width: 90%; // 设置宽度为90%
+  margin: 20px auto 0; // 设置顶部间距为20px，水平居中
+
+  @include breakpoint(tablet) {
+    grid-template-areas: "logo" "title" "description";
+    grid-template-columns: auto;
+  }
+
+  .category-logo {
+    grid-area: logo;
+    align-self: center;
+    margin: 0 1em 0 0;
+    --max-height: 8em;
+    border-radius: 20px; // 修改为20px圆角
+
+    @include breakpoint(tablet) {
+      margin: 0 0 0.5em;
+    }
+  }
+
+  .category-title {
+    grid-area: title;
+    align-self: end;
+  }
+  .category-title-description {
+    grid-area: description;
+  }
+}
+
+div[class^="category-title-header"] {
+  display: flex;
+  width: 90%; // 设置宽度为90%
+  justify-content: center; // 水平居中
+  align-items: center; // 垂直居中
+  margin: 20px auto 0; // 设置顶部间距为20px，水平居中
+  border-radius: 20px; // 修改为20px圆角
+
+  @if $align_text == "center" {
+    text-align: center;
+  }
+  @if $align_text == "right" {
+    text-align: right;
+  }
+
+  .category-title-contents {
+    max-width: 500px;
+    padding: 40px;
+    border-radius: 20px; // 修改为20px圆角
+
+    .d-icon-lock {
+      height: 0.75em;
+      width: 0.75em;
+      vertical-align: 0;
+    }
+  }
+
+  .category-title-description {
+    a,
+    a:visited {
+      color: currentColor;
+      text-decoration: underline;
+    }
+
+    a.mention,
+    a.mention-group {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    span.mention {
+      color: inherit;
+    }
+  }
+
+  // styles that impact the category icons theme component
+  .category-icon-widget-wrapper {
+    display: inline-block;
+
+    .category-icon-widget {
+      display: flex;
+      border-radius: 20px; // 修改为20px圆角
+
+      .category-icon {
+        display: flex;
+        border-radius: 50%; // 使图标完全变成圆形
+        @if $override_category_icon_color == "true" {
+          color: currentColor !important; // overrides inline style
+        }
+
+        .d-icon {
+          height: 0.75em;
+          width: 0.75em;
+        }
+      }
+    }
+  }
+}
+
+@if $plugin_outlet == "header-list-container-bottom" {
+  #header-list-area {
+    display: flex;
+    flex-direction: column-reverse;
+    border-radius: 20px; // 修改为20px圆角
+    width: 90%; // 设置宽度为90%
+    margin: 20px auto 0; // 设置顶部间距为20px，水平居中
+  }
+}

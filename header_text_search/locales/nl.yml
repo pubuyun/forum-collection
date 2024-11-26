@@ -1,0 +1,10 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
+nl:
+  search_banner:
+    headline: "Welkom bij onze community"
+    subhead: "We zijn blij dat je er bent. Als je hulp nodig hebt, zoek dan eerst voordat je een bericht plaatst."

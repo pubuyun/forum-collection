@@ -1,0 +1,40 @@
+{{#if this.shouldRenderHeadings}}
+    <div class="button-group" style="margin: 0 0 30px 0">
+        
+        {{#if this.secondCategories}}
+            <button 
+                class="btn btn-icon-text btn-primary" 
+                {{on "click" (fn this.scrollToCategory "second-category-group")}}
+            >
+                {{theme-setting "second_categories_header"}}
+            </button>
+        {{/if}}
+
+        {{#if this.thirdCategories}}
+            <button 
+                class="btn btn-icon-text btn-primary" 
+                {{on "click" (fn this.scrollToCategory "third-category-group")}}
+            >
+                {{theme-setting "third_categories_header"}}
+            </button>
+    {{/if}}
+
+        {{#if this.forthCategories}}
+            <button 
+                class="btn btn-icon-text btn-primary" 
+                {{on "click" (fn this.scrollToCategory "fourth-category-group")}}
+            >
+                {{theme-setting "fourth_categories_header"}}
+            </button>
+    {{/if}}
+
+        {{#if this.fifthCategories}}
+            <button 
+                class="btn btn-icon-text btn-primary" 
+                {{on "click" (fn this.scrollToCategory "fifth-category-group")}}
+            >
+                {{theme-setting "fifth_categories_header"}}
+            </button>
+    {{/if}}
+    </div>
+{{/if}}

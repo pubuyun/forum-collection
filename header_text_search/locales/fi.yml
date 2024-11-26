@@ -1,0 +1,10 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
+fi:
+  search_banner:
+    headline: "Tervetuloa yhteisöömme"
+    subhead: "Mukavaa, että olet täällä. Jos tarvitset apua, hae ennen kuin kirjoitat viestin."
